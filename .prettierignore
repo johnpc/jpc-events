@@ -1,0 +1,4 @@
+public
+*.ico
+.gitignore
+.prettierignore
