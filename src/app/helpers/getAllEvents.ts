@@ -18,7 +18,7 @@ export enum PROVIDERS {
 }
 
 const allProviders = [
-  PROVIDERS.CITY_OF_ANN_ARBOR,
+  // PROVIDERS.CITY_OF_ANN_ARBOR,
   PROVIDERS.MICHGIAN_THEATER,
   PROVIDERS.AADL,
   PROVIDERS.BLIND_PIG,
@@ -31,7 +31,9 @@ export type AnnArborEvent = {
   link: string;
   description?: string;
   date: Date;
+  timestamp: number;
   source: PROVIDERS;
+  rawItem: any;
 };
 
 const getCityOfAnnArborEvents = async (): Promise<AnnArborEvent[]> => {
@@ -52,7 +54,9 @@ const getCityOfAnnArborEvents = async (): Promise<AnnArborEvent[]> => {
       link,
       description,
       date,
+      timestamp: date.getTime(),
       source: PROVIDERS.CITY_OF_ANN_ARBOR,
+      rawItem: item,
     });
   }
 
@@ -78,7 +82,9 @@ const getMichiganTheaterEvents = async (): Promise<AnnArborEvent[]> => {
       title: title!,
       link,
       date,
+      timestamp: date.getTime(),
       source: PROVIDERS.MICHGIAN_THEATER,
+      rawItem: item,
     });
   }
   return events;
@@ -106,7 +112,9 @@ const getAadlEvents = async (): Promise<AnnArborEvent[]> => {
       title: title!,
       link,
       date,
+      timestamp: date.getTime(),
       source: PROVIDERS.AADL,
+      rawItem: item,
     });
   }
   return events;
@@ -131,7 +139,9 @@ const getBlindPigEvents = async (): Promise<AnnArborEvent[]> => {
       title: title!,
       link,
       date,
+      timestamp: date.getTime(),
       source: PROVIDERS.AADL,
+      rawItem: item,
     });
   }
   return events;
@@ -153,7 +163,9 @@ const getUmichEvents = async (): Promise<AnnArborEvent[]> => {
       title: title!,
       link,
       date,
+      timestamp: date.getTime(),
       source: PROVIDERS.UMICH_EVENTS,
+      rawItem: item,
     });
   }
   return events;
@@ -175,11 +187,14 @@ const getEventbriteEvents = async (): Promise<AnnArborEvent[]> => {
       title: title!,
       link,
       date,
+      timestamp: date.getTime(),
       source: PROVIDERS.EVENTBRITE,
+      rawItem: item,
     });
   }
   return events;
 };
+
 const getRssEvents = (provider: PROVIDERS): Promise<AnnArborEvent[]> => {
   switch (provider) {
     case PROVIDERS.CITY_OF_ANN_ARBOR:
@@ -205,13 +220,20 @@ export const getAllEvents = async (): Promise<AnnArborEvent[]> => {
     getRssEvents(provider),
   );
   const resolvedPromises = await Promise.all(allProviderPromises);
-  return resolvedPromises.flat().sort((a, b) => {
-    const aTime = Number.isNaN(a.date.getTime())
-      ? 10000000000000
-      : a.date.getTime();
-    const bTime = Number.isNaN(b.date.getTime())
-      ? 10000000000000
-      : b.date.getTime();
-    return aTime - bTime;
-  });
+  return resolvedPromises
+    .flat()
+    .filter(
+      (a) =>
+        !Number.isNaN(a.date.getTime()) &&
+        a.date.getTime() >= new Date().getTime(),
+    )
+    .sort((a, b) => {
+      const aTime = Number.isNaN(a.date.getTime())
+        ? 10000000000000 // Invalid dates should be sent to the back of the line
+        : a.date.getTime();
+      const bTime = Number.isNaN(b.date.getTime())
+        ? 10000000000000
+        : b.date.getTime();
+      return aTime - bTime;
+    });
 };

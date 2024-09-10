@@ -1,6 +1,6 @@
 import { Parser } from "xml2js";
 export const getRssAsJson = async (feedUrl: string) => {
-  const fetchResponse = await fetch(feedUrl);
+  const fetchResponse = await fetch(`${feedUrl}?test=1`);
   const xml = await fetchResponse.text();
   const parser = new Parser();
   const json = await parser.parseStringPromise(xml);
