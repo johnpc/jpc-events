@@ -4,6 +4,9 @@ import { AmplifyFunction, ConstructFactory } from "@aws-amplify/plugin-types";
 
 const schema = a
   .schema({
+    StringType: a.customType({
+      value: a.string(),
+    }),
     Event: a
       .model({
         id: a.string().required(),
@@ -21,15 +24,15 @@ const schema = a
 
     getEvents: a
       .query()
-      .arguments({})
-      .returns(a.string())
+      .arguments({ location: a.string() })
+      .returns(a.ref("StringType"))
       .handler(a.handler.function(getEvents))
       .authorization((allow) => allow.authenticated()),
 
     getCurrentDate: a
       .query()
-      .arguments({})
-      .returns(a.string())
+      .arguments({ location: a.string() })
+      .returns(a.ref("StringType"))
       .handler(a.handler.function(getCurrentDate))
       .authorization((allow) => allow.authenticated()),
 

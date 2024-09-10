@@ -41,5 +41,5 @@ export const handler: Schema["getEvents"]["functionHandler"] = async () => {
     },
   });
   console.log({ events: events.data.listEventByYear.items });
-  return JSON.stringify(events.data.listEventByYear.items);
+  return { value: JSON.stringify(events.data.listEventByYear.items) };
 };
